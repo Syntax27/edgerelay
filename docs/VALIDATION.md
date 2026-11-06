@@ -46,7 +46,3 @@ python scripts/benchmark.py --binary build/edgerelay.exe --connections 300 --con
 | Through EdgeRelay | 300 | 742.32 | 11.967 ms | 25.458 ms |
 
 These are observations from one closed-loop loopback run. Each measurement includes connection establishment, the Python harness, byte exchange, half-close, and completion. Ten warm-up exchanges per path and process startup are excluded. Raw samples and environment details are in the JSON. The direct path ran before the relay path, so host-load or ordering effects are not controlled by this experiment. This record does not establish a maximum throughput or isolated forwarding latency.
-
-## Scope
-
-The test matrix validates Windows and Linux on GitHub after publication. Review the workflow's actual status rather than inferring success from the presence of the workflow file. The local results above do not establish public-network security, production deployment, application-level health detection, TLS behavior, or performance at scale.

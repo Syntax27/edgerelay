@@ -1,8 +1,6 @@
 # EdgeRelay
 
-A C++20 TCP load balancer with bounded concurrency, per-source connection admission, passive circuit breakers, and Prometheus-compatible metrics.
-
-EdgeRelay forwards opaque byte streams. Its reliability behavior is exercised against real TCP servers: failover, recovery, backpressure, half-close handling, idle expiry, and overload rejection.
+EdgeRelay is a C++20 load balancer for TCP services on IPv4 loopback. It assigns each connection to an upstream, limits how many connections can wait, and skips upstreams whose circuit breakers are open. A separate listener exposes Prometheus metrics.
 
 ## Architecture
 
@@ -22,13 +20,13 @@ flowchart LR
     M --> H[Separate metrics listener]
 ```
 
-### Implemented behavior
+### Connection handling
 
 - **Controlled resource use:** fixed workers, finite waiting queue, a capped source map, and two 64 KiB user-space buffers per active relay. The socket receive/send buffers and kernel listen backlog are additional resources.
 - **TCP correctness:** partial reads/writes, simultaneous bidirectional traffic, byte-preserving forwarding, and propagation of write-half closures after pending data drains.
 - **Passive failover:** failed connection attempts try another eligible upstream. A failure threshold opens that upstream's circuit; after cooldown one connection may probe recovery. A generation token prevents stale connection results from changing a newer circuit state.
 - **Connection admission:** per-source token buckets allow bounded bursts and continuous refill. The source map refuses new entries when full unless a sufficiently idle, fully refilled entry can be reclaimed.
-- **Observable outcomes:** accepted/rejected connections, queue depth, active workers, forwarded bytes, connection failures, circuit state, and idle timeouts.
+- **Metrics:** accepted and rejected connections, queue depth, active workers, forwarded bytes, connection failures, circuit state, and idle timeouts.
 - **Portable socket layer:** Winsock/select on Windows; POSIX sockets/poll on Linux.
 
 ## Build
